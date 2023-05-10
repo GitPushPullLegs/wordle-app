@@ -39,6 +39,7 @@ api.register_api(game_api)
 
 @app.before_request
 def load_user():
+    """Load the current user from the JWT token with each request."""
     g.current_user = None
     try:
         verify_jwt_in_request()
@@ -66,4 +67,5 @@ app.register_api(api)
 
 
 if __name__ == "__main__":
+    # Only used for local development.
     app.run(debug=True, load_dotenv=True)
