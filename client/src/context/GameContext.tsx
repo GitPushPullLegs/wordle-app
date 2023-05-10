@@ -20,6 +20,7 @@ interface GameContextData {
   endGame: (solvedRow?: number) => void
   getPreviousGuesses: (gameId: string) => void
   guess: (word: string) => void
+  setState: (value: string) => void
 }
 
 export const GameContext = createContext<GameContextData>({
@@ -29,6 +30,7 @@ export const GameContext = createContext<GameContextData>({
   endGame: () => {},
   getPreviousGuesses: () => {},
   guess: () => {},
+  setState: () => {},
 })
 
 
@@ -117,6 +119,10 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
     }
   }
 
+  function setStateCustom(customState: string) {
+    setState(customState)
+  }
+
   useEffect(() => {
     // End game will make game undefined. This will start a new game.
     // Also has the benefit of preloading the first game.
@@ -137,7 +143,7 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
   }, [previousGuesses])
 
   return (
-    <GameContext.Provider value={{ game, previousGuesses, state, startGame, endGame, getPreviousGuesses, guess }}>
+    <GameContext.Provider value={{ game, previousGuesses, state, setState: setStateCustom, startGame, endGame, getPreviousGuesses, guess }}>
       {children}
     </GameContext.Provider>
   )

@@ -17,6 +17,7 @@ export default function FeedbackSnackbar({ open, onClose, value }: FeedbackSnack
     "Phew!",
     "Barely made it!",
     `Oops! It was ${value}!`,
+    "Too short!",
   ]
 
   return (
@@ -30,7 +31,7 @@ export default function FeedbackSnackbar({ open, onClose, value }: FeedbackSnack
       }}
     >
       <Alert icon={false} severity={typeof value === "number" ? "success" : "error"} sx={{ width: '100%' }}>
-        {messages[typeof value === "string" ? messages.length - 1 : value - 1]}
+        {messages[typeof value === "string" ? (value === "too-short" ? messages.length - 1 : messages.length - 2) : value - 1]}
       </Alert>
     </Snackbar>
   )

@@ -10,7 +10,7 @@ import FeedbackSnackbar from "../components/FeedbackSnackbar";
 
 export default function PlayPage() {
 
-  const { game, previousGuesses, state, guess } = useContext(GameContext)
+  const { game, previousGuesses, state, setState, guess } = useContext(GameContext)
   const [currentGuess, setCurrentGuess] = useState("")
   const [inWordKeys, setInWordKeys] = useState<string[]>([])
   const [notInWordKeys, setNotInWordKeys] = useState<string[]>([])
@@ -24,7 +24,7 @@ export default function PlayPage() {
       setCurrentGuess(current => current.length >= 5 ? current : current + key.toUpperCase())
     } else if (key === "Enter") {
       if (currentGuess.length !== 5) {
-        console.log("Too short.") // TODO: Inform the user.
+        setState("too-short")
       } else {
         guess(currentGuess)
         setCurrentGuess("")
@@ -70,7 +70,10 @@ export default function PlayPage() {
 
   // Provide the user with feedback if they won or lost.
   useEffect(() => {
-    if (typeof state === "number" || (state !== "loading" && state !== "loaded")) {
+    if (state === "too-short") {
+      setShowSnack(true)
+      setTimeout(() => setState("loaded"), 2000)
+    } else if (typeof state === "number" || (state !== "loading" && state !== "loaded")) {
       setShowSnack(true)
       setInWordKeys([])
       setNotInWordKeys([])
