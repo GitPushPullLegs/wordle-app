@@ -1,6 +1,7 @@
 import React from "react";
 import {AppBar, Toolbar} from "@mui/material";
 import Logo from "./Logo";
+import StatsChip from "./stats/StatsChip";
 
 export default function Navbar() {
   return (<>
@@ -11,6 +12,8 @@ export default function Navbar() {
     }}>
       <Toolbar>
         <Logo/>
+        <div style={{ flex: "1 0 0" }} />
+        <StatsChip />
       </Toolbar>
     </AppBar>
   </>)
