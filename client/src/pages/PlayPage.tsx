@@ -5,6 +5,7 @@ import {grey} from "@mui/material/colors";
 import TileGrid from "../components/gameboard/TileGrid";
 import {GameContext} from "../context/GameContext";
 import Keyboard from "../components/keyboard/Keyboard";
+import FeedbackSnackbar from "../components/FeedbackSnackbar";
 
 
 export default function PlayPage() {
@@ -13,6 +14,7 @@ export default function PlayPage() {
   const [currentGuess, setCurrentGuess] = useState("")
   const [inWordKeys, setInWordKeys] = useState<string[]>([])
   const [notInWordKeys, setNotInWordKeys] = useState<string[]>([])
+  const [showSnack, setShowSnack] = useState(false)
 
   const handleInput = (key: string) => {
     if (state === "loading") return
@@ -66,6 +68,15 @@ export default function PlayPage() {
     }
   }, [previousGuesses])
 
+  // Provide the user with feedback if they won or lost.
+  useEffect(() => {
+    if (typeof state === "number") {
+      setShowSnack(true)
+      setInWordKeys([])
+      setNotInWordKeys([])
+    }
+  }, [state])
+
   return (<>
     <Navbar/>
     <Card
@@ -81,5 +92,6 @@ export default function PlayPage() {
       <TileGrid guesses={previousGuesses.map(g => g.guess)} currentGuess={currentGuess} answer={game?.word ?? ""} />
     </Card>
     <Keyboard onClick={handleKeyClick} inWordKeys={inWordKeys} notInWordKeys={notInWordKeys} />
+    <FeedbackSnackbar answer={game?.word ?? ""} open={showSnack} onClose={() => setShowSnack(false)} row={typeof state === "number" ? state : 0} />
   </>)
 }
