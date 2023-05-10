@@ -15,6 +15,11 @@ handlers:
     http_headers:
       Strict-Transport-Security: "max-age=31536000; includeSubDomains"
 
+  # Route all /api requests to the Flask server
+  - url: /api/.*
+    script: auto
+    secure: always
+
   # Serve React index.html file for all other routes
   - url: /.*
     static_files: client/build/index.html
@@ -22,11 +27,6 @@ handlers:
     secure: always
     http_headers:
       Strict-Transport-Security: "max-age=31536000; includeSubDomains"
-
-  # Route all /api requests to the Flask server
-  - url: /api/.*
-    script: auto
-    secure: always
 env_variables:
   GCP_PROJECT: wordle-386115
   FLASK_ENV: production
