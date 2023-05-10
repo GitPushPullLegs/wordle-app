@@ -1,0 +1,14 @@
+runtime: python37
+entrypoint: gunicorn -b :$PORT --timeout 240 -w 3 --worker-class gevent server.main:app
+instance_class: F4
+automatic_scaling:
+  max_instances: 15
+  max_concurrent_requests: 150
+
+default_expiration: "5m"
+handlers:
+- url: /.*
+  secure: always
+  script: auto
+env_variables:
+  GCP_PROJECT: wordle-386115

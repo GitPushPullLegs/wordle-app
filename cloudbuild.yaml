@@ -1,0 +1,15 @@
+steps:
+- name: node
+  entrypoint: npm
+  args: ['install']
+  dir: client
+- name: node
+  entrypoint: npm
+  args: ['run', 'build']
+  dir: client
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'bash'
+  args: ['-c', 'gcloud beta app deploy --verbosity=debug app.yaml']
+timeout: 1200s
+options:
+  machineType: 'E2_HIGHCPU_32'
