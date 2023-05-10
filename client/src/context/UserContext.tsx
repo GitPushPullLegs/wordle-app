@@ -3,7 +3,7 @@ import useFetch from "../api/useFetch";
 
 
 interface User {
-  user_id: string
+  user_id?: string
   first_name?: string
   last_name?: string
   full_name?: string
@@ -22,9 +22,8 @@ interface UserContextData {
   fetchStatus?: FetchStatus
 }
 
-const UserContext = createContext<UserContextData>({
+export const UserContext = createContext<UserContextData>({
   user: {
-    user_id: "",
     level: 1,
     current_streak: 0,
     longest_streak: 0,
@@ -35,7 +34,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const fetch = useFetch()
 
   const [user, setUser] = useState<User>({
-    user_id: "",
     level: 1,
     current_streak: 0,
     longest_streak: 0,
@@ -65,9 +63,4 @@ export function UserProvider({ children }: { children: ReactNode }) {
       {children}
     </UserContext.Provider>
   )
-}
-
-export default function useUser() {
-  const { user } = useContext(UserContext)
-  return user
 }
