@@ -1,6 +1,11 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+from gevent import monkey
+monkey.patch_all()
+import grpc._cython.cygrpc
+grpc._cython.cygrpc.init_grpc_gevent()
+
 from flask_jwt_extended.exceptions import JWTExtendedException
 from jwt import PyJWTError
 
