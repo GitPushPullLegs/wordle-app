@@ -1,4 +1,4 @@
-import React, {createContext, useState} from "react";
+import React, {createContext, useEffect, useState} from "react";
 import useFetch from "../api/useFetch";
 
 
@@ -57,6 +57,10 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
           ...(solvedRow && { solved_row: solvedRow })
         }
       })
+        .then(() => {
+          setGame(undefined)
+          setPreviousGuesses([])
+        })
     } else {
       console.log("No active game.")
     }
@@ -87,6 +91,14 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
       console.log("No active game.")
     }
   }
+
+  useEffect(() => {
+    // End game will make game undefined. This will start a new game.
+    // Also has the benefit of preloading the first game.
+    if (!game) {
+      startGame()
+    }
+  }, [game])
 
   return (
     <GameContext.Provider value={{ game, previousGuesses, startGame, endGame, getPreviousGuesses, guess }}>
