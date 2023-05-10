@@ -74,9 +74,8 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
   }
 
   function guess(word: string) {
-    setPreviousGuesses(current => [...current, { guess: word }])
-
     if (game) {
+      setPreviousGuesses(current => [...current, { guess: word }])
       fetch("/api/game/guess/submit", {
         args: {
           game_id: game.game_id,
