@@ -76,9 +76,7 @@ def update_game(query: GameRequest):
     if query.solved_row:
         user_stats.current_streak += 1
         user_stats.longest_streak = max(user_stats.longest_streak, user_stats.current_streak)
-        print(user_stats.distribution)
         user_distribution = user_stats.distribution_dict
-        print(user_distribution)
         user_distribution[str(query.solved_row)] += 1
         user_stats.distribution = json.dumps(user_distribution)
     else:

@@ -21,6 +21,6 @@ def get_stats():
     if not user:
         return jsonify(status="unauthorized", message="Login required")
 
-    stats = Stats.get(user_id=user.user_id)
+    stats = Stats.get(user_id=user.user_id)  # A stats object is always created when a user is created.
 
     return jsonify(status="ok", stats=stats.dict(exclude={"write_ts"}))
