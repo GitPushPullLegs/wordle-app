@@ -10,11 +10,12 @@ handlers:
 - url: /api/.*
   script: auto
   secure: always
-- url: /(?!api|static).*  # exclude routes starting with /api or /static
+- url: /.*
   secure: always
-  static_files: client/build/index.html
-  upload: client/build/index.html
   expiration: "1m"
+  http_headers:
+    Cache-Control: public, max-age=10, s-max-age=10
+    Strict-Transport-Security: max-age=63072000; includeSubDomains
 env_variables:
   GCP_PROJECT: wordle-386115
   FLASK_ENV: production
