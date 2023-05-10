@@ -14,6 +14,7 @@ from flask import jsonify, redirect, g
 
 from server.api.auth import api as auth_api
 from server.api.user import api as user_api
+from server.api.game import api as game_api
 
 app = OpenAPI(__name__, doc_ui=True, doc_prefix="/docs")
 
@@ -28,6 +29,7 @@ jwt = JWTManager(app)
 api = APIBlueprint("/api", __name__, url_prefix="/api")
 api.register_api(auth_api)
 api.register_api(user_api)
+api.register_api(game_api)
 
 
 @app.before_request
