@@ -7,7 +7,7 @@ from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel
 
 
-from server.models.game import Game
+from server.models.game import Game, Guess
 from server.word_list import WORDS
 
 api = APIBlueprint("/game", __name__, url_prefix="/game")
@@ -76,3 +76,46 @@ def update_game(query: GameRequest):
     g.current_user.save()
 
     return jsonify(status="ok", game=game.dict(), user=g.current_user.dict(exclude={"credentials", "write_ts"}))
+
+
+class GuessRequest(BaseModel):
+    game_id: str
+
+    # The following are optional because we use this same request model to list previous requests.
+    guess: Optional[str]
+    is_correct: Optional[bool]
+
+
+@api.get("/guess/list")
+def list_guesses(query: GuessRequest):
+    user = g.current_user
+
+    if not user:
+        return jsonify(status="unauthorized", message="Login required")
+
+    # Generates a list of dicts from whatever previous guesses exist in reverse order since they're returned by
+    # write_ts in DESC order.
+    guess_list = [
+        guess.dict(exclude={"game_id", "correct", "guess_id"}) for guess in Guess.get_all(game_id=query.game_id)[::-1]]
+
+    return jsonify(status="ok", guess_list=guess_list)
+
+
+@api.get("/guess/submit")
+def submit_guess(query: GuessRequest):
+    user = g.current_user
+
+    if not user:
+        return jsonify(status="unauthorized", message="Login required")
+
+    if not query.guess or not query.is_correct:
+        return jsonify(status="error", message="Missing required fields")
+
+    Guess(
+        game_id=query.game_id,
+        guess_id=str(uuid.uuid4()),
+        guess=query.guess,
+        correct=query.is_correct,
+    ).save()
+
+    return jsonify(status="ok")
