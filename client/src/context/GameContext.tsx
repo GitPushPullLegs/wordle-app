@@ -14,7 +14,7 @@ interface Guess {
 interface GameContextData {
   game?: Game
   previousGuesses: Guess[]
-  state: "loading" | "loaded" | number  // If the state is a number, it's the row that was solved.
+  state: "loading" | "loaded" | number | string  // If the state is a number, that's the row it was solved. If it's text that's not loading or loaded, it's the answer.
   startGame: () => void
   endGame: (solvedRow?: number) => void
   getPreviousGuesses: (gameId: string) => void
@@ -36,7 +36,7 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
 
   const [game, setGame] = useState<Game>()
   const [previousGuesses, setPreviousGuesses] = useState<Guess[]>([])
-  const [state, setState] = useState<"loading"|"loaded"|number>("loading")
+  const [state, setState] = useState<"loading"|"loaded"|number|string>("loading")
 
   function startGame() {
     setState("loading")
@@ -64,11 +64,16 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
         }
       })
         .then(() => {
-          setState(solvedRow ? solvedRow : 0)
-          setTimeout(() => {
+          if (!solvedRow) {
+            setState(game.word)
+            setTimeout(() => {
+              setGame(undefined)
+              setPreviousGuesses([])
+            }, 2500)
+          } else {
             setGame(undefined)
             setPreviousGuesses([])
-          }, 2500)
+          }
         })
     } else {
       console.log("No active game.")
@@ -89,6 +94,9 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
 
   function guess(word: string) {
     if (game) {
+      if (word === game.word) {
+        setState(previousGuesses.length + 1)
+      }
       setPreviousGuesses(current => [...current, { guess: word }])
       fetch("/api/game/guess/submit", {
         args: {

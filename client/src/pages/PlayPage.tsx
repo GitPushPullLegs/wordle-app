@@ -70,7 +70,7 @@ export default function PlayPage() {
 
   // Provide the user with feedback if they won or lost.
   useEffect(() => {
-    if (typeof state === "number") {
+    if (typeof state === "number" || (state !== "loading" && state !== "loaded")) {
       setShowSnack(true)
       setInWordKeys([])
       setNotInWordKeys([])
@@ -92,6 +92,6 @@ export default function PlayPage() {
       <TileGrid guesses={previousGuesses.map(g => g.guess)} currentGuess={currentGuess} answer={game?.word ?? ""} />
     </Card>
     <Keyboard onClick={handleKeyClick} inWordKeys={inWordKeys} notInWordKeys={notInWordKeys} />
-    <FeedbackSnackbar answer={game?.word ?? ""} open={showSnack} onClose={() => setShowSnack(false)} row={typeof state === "number" ? state : 0} />
+    <FeedbackSnackbar open={showSnack} onClose={() => setShowSnack(false)} value={state} />
   </>)
 }
