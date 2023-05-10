@@ -2,3 +2,6 @@
 .idea/
 __pycache__/
 credentials.json
+venv/*
+venv
+client/node_modules/*
