@@ -14,7 +14,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   useEffect(() => {
     if (fetchStatus === "fetched" && user.user_id) {
-      navigate("/w/play")
+      navigate("/play")
     }
   }, [user])
 
