@@ -1,4 +1,5 @@
 import datetime
+import json
 import uuid
 from typing import Optional
 
@@ -8,6 +9,7 @@ from pydantic import BaseModel
 
 
 from server.models.game import Game, Guess
+from server.models.stats import Stats
 from server.word_list import WORDS
 
 api = APIBlueprint("/game", __name__, url_prefix="/game")
@@ -63,19 +65,33 @@ def update_game(query: GameRequest):
 
     game.save()
 
-    # TODO: I don't like storing the stats in the user model.
-
+    # Move the user to the next level.
     g.current_user.level += 1
-
-    if query.solved_row:
-        g.current_user.current_streak += 1
-        g.current_user.longest_streak = max(g.current_user.longest_streak, g.current_user.current_streak)
-    else:
-        g.current_user.current_streak = 0
-
     g.current_user.save()
 
-    return jsonify(status="ok", game=game.dict(), user=g.current_user.dict(exclude={"credentials", "write_ts"}))
+    # Update stats
+    user_stats = Stats.get(user_id=user.user_id)
+    user_stats.games_played += 1
+
+    if query.solved_row:
+        user_stats.current_streak += 1
+        user_stats.longest_streak = max(user_stats.longest_streak, user_stats.current_streak)
+        print(user_stats.distribution)
+        user_distribution = user_stats.distribution_dict
+        print(user_distribution)
+        user_distribution[str(query.solved_row)] += 1
+        user_stats.distribution = json.dumps(user_distribution)
+    else:
+        user_stats.current_streak = 0
+
+    user_stats.save()
+
+    return jsonify(
+        status="ok",
+        game=game.dict(),
+        user=g.current_user.dict(exclude={"credentials", "write_ts"}),
+        stats=user_stats.dict(exclude={"write_ts"}),
+    )
 
 
 class GuessRequest(BaseModel):

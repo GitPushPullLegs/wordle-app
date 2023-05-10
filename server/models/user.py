@@ -18,9 +18,6 @@ class User(Base):
 
     level: int = 1
 
-    current_streak: int = 0
-    longest_streak: int = 0
-
     @property
     def creds(self):
         """Returns the Google Credentials object for the user"""

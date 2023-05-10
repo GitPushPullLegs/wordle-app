@@ -8,6 +8,7 @@ from requests_oauthlib import OAuth2Session
 
 from dotenv import load_dotenv
 
+from server.models.stats import Stats
 from server.models.user import User
 
 load_dotenv()
@@ -98,6 +99,19 @@ def google_oauth_callback():
                     scopes=token["scope"],
                 ))
             )
+
+            # Create a new stats object for the user.
+            Stats(
+                user_id=user_info["id"],
+                distribution=json.dumps({
+                    "1": 0,
+                    "2": 0,
+                    "3": 0,
+                    "4": 0,
+                    "5": 0,
+                    "6": 0,
+                })
+            ).save()
 
     user.save()
 
