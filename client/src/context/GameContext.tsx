@@ -56,6 +56,9 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
 
   function endGame(solvedRow?: number) {
     if (game) {
+      if (!solvedRow) {  // Immediately provide feedback.
+        setState(game.word)
+      }
       fetch("/api/game/stop", {
         args: {
           game_id: game.game_id,
@@ -64,16 +67,8 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
         }
       })
         .then(() => {
-          if (!solvedRow) {
-            setState(game.word)
-            setTimeout(() => {
-              setGame(undefined)
-              setPreviousGuesses([])
-            }, 2500)
-          } else {
-            setGame(undefined)
-            setPreviousGuesses([])
-          }
+          setGame(undefined)
+          setPreviousGuesses([])
         })
     } else {
       console.log("No active game.")
