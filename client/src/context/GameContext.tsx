@@ -49,13 +49,17 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
   }
 
   function endGame(solvedRow?: number) {
-    fetch("/api/game/stop", {
-      args: {
-        game_id: game?.game_id,
-        finished_at: new Date().toISOString(),
-        ...(solvedRow && { solved_row: solvedRow })
-      }
-    })
+    if (game) {
+      fetch("/api/game/stop", {
+        args: {
+          game_id: game.game_id,
+          finished_at: new Date().toISOString(),
+          ...(solvedRow && { solved_row: solvedRow })
+        }
+      })
+    } else {
+      console.log("No active game.")
+    }
   }
 
   function getPreviousGuesses(gameId: string) {
@@ -72,13 +76,17 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
   function guess(word: string) {
     setPreviousGuesses(current => [...current, { guess: word }])
 
-    fetch("/api/game/guess/submit", {
-      args: {
-        game_id: game?.game_id,
-        guess: word,
-        correct: word === game?.word
-      }
-    })
+    if (game) {
+      fetch("/api/game/guess/submit", {
+        args: {
+          game_id: game.game_id,
+          guess: word,
+          correct: word === game.word
+        }
+      })
+    } else {
+      console.log("No active game.")
+    }
   }
 
   return (
