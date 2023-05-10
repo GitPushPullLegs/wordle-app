@@ -10,8 +10,18 @@ handlers:
 - url: /api/.*
   script: auto
   secure: always
-- url: /.*
+- url: /
   secure: always
+  static_files: client/build/index.html
+  upload: client/build/index.html
+  expiration: "1m"
+  http_headers:
+    Cache-Control: public, max-age=10, s-max-age=10
+    Strict-Transport-Security: max-age=63072000; includeSubDomains
+- url: /(.*)
+  secure: always
+  static_files: client/build/\1
+  upload: client/build/(.*)
   expiration: "1m"
   http_headers:
     Cache-Control: public, max-age=10, s-max-age=10
