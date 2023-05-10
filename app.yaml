@@ -10,7 +10,7 @@ handlers:
 - url: /api/.*
   script: auto
   secure: always
-- url: /.*
+- url: /(?!api|static).*  # exclude routes starting with /api or /static
   secure: always
   static_files: client/build/index.html
   upload: client/build/index.html
