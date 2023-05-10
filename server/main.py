@@ -54,7 +54,7 @@ def load_user():
 
 @jwt.unauthorized_loader
 def unauthorized_callback(callback):
-    return redirect("/w/")
+    return redirect("/")
 
 
 @api.get("/ping")

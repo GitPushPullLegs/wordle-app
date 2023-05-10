@@ -11,7 +11,7 @@ function PrivateRoute() {
   if (fetchStatus === "fetched" && user.user_id) {  // If fetched and user found, continue.
     return <Outlet/>
   } else if (fetchStatus === "fetched" || fetchStatus === "failed") {  // Else, redirect to log in.
-    return <Navigate to={"/w/"} />
+    return <Navigate to={"/"} />
   } else {  // If still fetching.
     return <></>
   }
@@ -20,11 +20,11 @@ function PrivateRoute() {
 export default function Routing() {
   return (
     <Routes>
-      <Route path={"/w/"} element={<LoginPage/>} />
+      <Route path={"/"} element={<LoginPage/>} />
       <Route element={<PrivateRoute/>}>
-        <Route path={"/w/play"} element={<PlayPage/>} />
+        <Route path={"/play"} element={<PlayPage/>} />
       </Route>
-      <Route path={"*"} element={<Navigate to={"/w/"} replace />} />
+      <Route path={"*"} element={<Navigate to={"/"} replace />} />
     </Routes>
   )
 }
