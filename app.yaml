@@ -10,22 +10,16 @@ handlers:
 - url: /api/.*
   script: auto
   secure: always
-- url: /
+- url: /.*
   secure: always
   static_files: client/build/index.html
   upload: client/build/index.html
   expiration: "1m"
   http_headers:
-    Cache-Control: public, max-age=10, s-max-age=10
+    Cache-Control: no-store
+    x-frame-options: SAMEORIGIN
     Strict-Transport-Security: max-age=63072000; includeSubDomains
-- url: /(.*)
-  secure: always
-  static_files: client/build/\1
-  upload: client/build/(.*)
-  expiration: "1m"
-  http_headers:
-    Cache-Control: public, max-age=10, s-max-age=10
-    Strict-Transport-Security: max-age=63072000; includeSubDomains
+    X-Content-Type-Options: nosniff
 env_variables:
   GCP_PROJECT: wordle-386115
   FLASK_ENV: production
