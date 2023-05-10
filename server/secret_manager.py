@@ -8,6 +8,7 @@ lock = threading.Lock()
 
 
 class Singleton(type):
+    """Ensure there's only one instance of any subclass."""
     _instances = {}
 
     def __call__(cls, *args, **kwargs):
@@ -32,13 +33,17 @@ class Secrets(metaclass=Singleton):
         return self._service
 
     def get(self, key):
+        # If the key has been queried before, return it from memory.
         if key in self.__data:
             value = self.__data.get(key)
+        # If it exists as an environment variable, return it from there.
         elif environ.get(key):
             value = environ[key]
+        # Otherwise, fetch it from Secret Manager.
         else:
             value = self._fetch(key)
 
+        # Store the value in memory for future use.
         self.__data[key] = value
         return value
 
