@@ -108,7 +108,7 @@ def submit_guess(query: GuessRequest):
     if not user:
         return jsonify(status="unauthorized", message="Login required")
 
-    if not query.guess or not query.is_correct:
+    if not query.guess or query.is_correct is None:
         return jsonify(status="error", message="Missing required fields")
 
     Guess(
