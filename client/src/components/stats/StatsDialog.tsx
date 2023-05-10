@@ -32,6 +32,7 @@ export default function StatsDialog({ open, onClose }: StatsDialogProps) {
   const [winPercentage, setWinPercentage] = useState(0)
   useEffect(() => {
     if (stats) {
+      // Calculate win percentage based on games won in distribution and total games played.
       let gamesWon = Object.values(stats.distribution).reduce((a, b) => a + b, 0)
       setWinPercentage(Math.round((gamesWon / stats.games_played) * 100))
     }
@@ -77,6 +78,9 @@ function StatItem({ label, value }: { label: string, value: string | number }) {
   )
 }
 
+/**
+ * Returns a horizontal bar chart of the guess distribution.
+ * */
 function DistributionChart() {
 
   const { stats } = useContext(UserContext)
