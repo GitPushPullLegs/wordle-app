@@ -7,8 +7,22 @@ automatic_scaling:
 
 default_expiration: "5m"
 handlers:
+- url: /static/js
+  static_dir: client/build/static/js
+  expiration: "1m"
+  http_headers:
+    Cache-Control: public, max-age=10, s-max-age=10
+    Strict-Transport-Security: max-age=63072000; includeSubDomains
+- url: /static/css
+  static_dir: client/build/static/css
+  expiration: "1m"
+  http_headers:
+    Cache-Control: public, max-age=10, s-max-age=10
+    Strict-Transport-Security: max-age=63072000; includeSubDomains
 - url: /.*
   secure: always
-  script: auto
+  static_files: client/build/index.html
+  upload: client/build/index.html
+  expiration: "1m"
 env_variables:
   GCP_PROJECT: wordle-386115
