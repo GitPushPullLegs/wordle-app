@@ -7,31 +7,29 @@ automatic_scaling:
 
 default_expiration: "5m"
 handlers:
-- url: /static/js
-  static_dir: client/build/static/js
-  expiration: "1m"
-  http_headers:
-    Cache-Control: public, max-age=10, s-max-age=10
-    Strict-Transport-Security: max-age=63072000; includeSubDomains
-- url: /static/css
-  static_dir: client/build/static/css
-  expiration: "1m"
-  http_headers:
-    Cache-Control: public, max-age=10, s-max-age=10
-    Strict-Transport-Security: max-age=63072000; includeSubDomains
-- url: /w/.*
-  secure: always
-  static_files: client/build/index.html
-  upload: client/build/index.html
-  expiration: "1m"
-  http_headers:
-    Cache-Control: no-store
-    Strict-Transport-Security: max-age=63072000; includeSubDomains
-- url: /.*
-  script: auto
-  secure: always
+  # Serve React static files
+  - url: /(.*\.(js|css|png|jpg|gif|ico|html|svg))
+    static_files: client/build/\1
+    upload: client/build/.*\.(js|css|png|jpg|gif|ico|html|svg)$
+    secure: always
+    http_headers:
+      Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+
+  # Serve React index.html file for all other routes
+  - url: /.*
+    static_files: client/build/index.html
+    upload: client/build/index.html
+    secure: always
+    http_headers:
+      Strict-Transport-Security: "max-age=31536000; includeSubDomains"
+
+  # Route all /api requests to the Flask server
+  - url: /api/.*
+    script: auto
+    secure: always
 env_variables:
   GCP_PROJECT: wordle-386115
   FLASK_ENV: production
   FLASK_APP: server/main.py
   OAUTHLIB_RELAX_TOKEN_SCOPE: 1
+  APP_ROOT: /srv
