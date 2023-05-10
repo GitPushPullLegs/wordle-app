@@ -9,6 +9,12 @@ import {
   useTheme
 } from "@mui/material";
 import {UserContext} from "../../context/UserContext";
+import {
+  Bar,
+} from "react-chartjs-2";
+import {Chart, registerables} from "chart.js";
+
+Chart.register(...registerables);
 
 
 interface StatsDialogProps {
@@ -47,6 +53,8 @@ export default function StatsDialog({ open, onClose }: StatsDialogProps) {
             <StatItem label={"Current Streak"} value={stats?.current_streak ?? 0} />
             <StatItem label={"Max Streak"} value={stats?.longest_streak ?? 0} />
           </Stack>
+          <Typography variant={"subtitle2"} sx={{ pt: 1 }}>Guess Distribution</Typography>
+          <DistributionChart />
         </Stack>
       </DialogContent>
     </Dialog>
@@ -59,5 +67,39 @@ function StatItem({ label, value }: { label: string, value: string | number }) {
       <Typography>{value}</Typography>
       <Typography variant={"caption"}>{label}</Typography>
     </Stack>
+  )
+}
+
+function DistributionChart() {
+
+  const { stats } = useContext(UserContext)
+
+  const data = {
+    labels: ["1", "2", "3", "4", "5", "6"],
+    datasets: [
+      {
+        label: "Guess Distribution",
+        data: stats?.distribution ? Object.values(stats.distribution): [0, 0, 0, 0, 0, 0],
+        borderWidth: 1,
+      }
+    ]
+  }
+
+  return (
+    <div>
+      <Bar
+        data={data}
+        options={{
+          plugins: {
+            title: {
+              display: false,
+              text: "Guess Distribution",
+            },
+            legend: { display: false }
+
+          }
+        }}
+        />
+    </div>
   )
 }
