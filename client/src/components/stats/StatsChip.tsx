@@ -9,7 +9,10 @@ import {KeyboardArrowRight} from "@mui/icons-material";
 export default function StatsChip() {
   const { stats } = useContext(UserContext)
 
-  const newLongestStreak = (stats?.current_streak ?? 0) >= (stats?.longest_streak ?? 1)
+  const currentStreak = stats?.current_streak ?? 0
+  const longestStreak = stats?.longest_streak ?? 1
+
+  const newLongestStreak = currentStreak >= longestStreak && longestStreak !== 0
 
   const [openDialog, setOpenDialog] = useState(false)
 
