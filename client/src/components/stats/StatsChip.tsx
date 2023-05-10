@@ -1,7 +1,8 @@
-import React, {useContext} from "react";
+import React, {useContext, useState} from "react";
 import {Avatar, Chip, Typography} from "@mui/material";
 import {UserContext} from "../../context/UserContext";
 import {grey} from "@mui/material/colors";
+import StatsDialog from "./StatsDialog";
 
 
 export default function StatsChip() {
@@ -9,7 +10,9 @@ export default function StatsChip() {
 
   const newLongestStreak = (stats?.current_streak ?? 0) < (stats?.longest_streak ?? 1)
 
-  return (
+  const [openDialog, setOpenDialog] = useState(false)
+
+  return (<>
     <Chip
       avatar={
         <Avatar sx={{ bgcolor: newLongestStreak ? "success.main": grey[300] }}>
@@ -17,6 +20,8 @@ export default function StatsChip() {
         </Avatar>
       }
       label={"Current Streak"}
+      onClick={() => setOpenDialog(true)}
     />
-  )
+    <StatsDialog open={openDialog} onClose={() => setOpenDialog(false)} />
+  </>)
 }
