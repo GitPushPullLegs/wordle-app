@@ -107,7 +107,7 @@ def google_oauth_callback():
     )
 
     # Set the access token in the cookies and redirect to the destination.
-    resp = redirect("/play")
+    resp = redirect("/w/play")
     set_access_cookies(resp, access_token)
 
     return resp
@@ -115,6 +115,6 @@ def google_oauth_callback():
 
 @api.get("/logout")
 def logout():
-    resp = redirect("/")
+    resp = redirect("/w/")
     unset_jwt_cookies(resp)
     return resp
