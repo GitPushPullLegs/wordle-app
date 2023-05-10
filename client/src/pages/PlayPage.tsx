@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import Navbar from "../components/Navbar";
-import {Card} from "@mui/material";
-import {grey} from "@mui/material/colors";
+import {Backdrop, Card, CircularProgress} from "@mui/material";
+import {blue, grey} from "@mui/material/colors";
 import TileGrid from "../components/gameboard/TileGrid";
 import {GameContext} from "../context/GameContext";
 import Keyboard from "../components/keyboard/Keyboard";
@@ -92,6 +92,9 @@ export default function PlayPage() {
         bgcolor: grey[50]
       }}
     >
+      <Backdrop open={state === "loading"} sx={{ bgcolor: "rgba(227, 242, 253, 0.5)"}}>
+        <CircularProgress />
+      </Backdrop>
       <TileGrid guesses={previousGuesses.map(g => g.guess)} currentGuess={currentGuess} answer={game?.word ?? ""} />
     </Card>
     <Keyboard onClick={handleKeyClick} inWordKeys={inWordKeys} notInWordKeys={notInWordKeys} />
