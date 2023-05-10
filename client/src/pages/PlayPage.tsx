@@ -1,11 +1,14 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import Navbar from "../components/Navbar";
 import {Card} from "@mui/material";
 import {grey} from "@mui/material/colors";
 import TileGrid from "../components/gameboard/TileGrid";
+import {GameContext} from "../context/GameContext";
 
 
 export default function PlayPage() {
+
+  const { game, startGame, endGame, guess, getPreviousGuesses } = useContext(GameContext)
 
   const [guesses, setGuesses] = useState<string[]>([])
   const [currentGuess, setCurrentGuess] = useState("")
@@ -14,13 +17,13 @@ export default function PlayPage() {
     let key = event.key
     if (key === "Backspace") {
       setCurrentGuess(current => current.slice(0, -1))
-    } else if (/^[a-zA-Z]$/i.test(key)) {
+    } else if (/^[a-zA-Z]$/i.test(key)) {  // Ensure that the key is a letter.
       setCurrentGuess(current => current.length >= 5 ? current : current + key.toUpperCase())
     } else if (key === "Enter") {
       if (currentGuess.length !== 5) {
         console.log("Too short.") // TODO: Inform the user.
       } else {
-        console.log("Submit the guess.")
+        guess(currentGuess)
       }
     }
   }, [currentGuess, guesses])
