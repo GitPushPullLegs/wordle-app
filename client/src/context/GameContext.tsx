@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useEffect, useState} from "react";
 import useFetch from "../api/useFetch";
-import {UserContext} from "./UserContext";
+import {UserContext, Stats} from "./UserContext";
 
 
 interface Game {
@@ -35,7 +35,7 @@ export const GameContext = createContext<GameContextData>({
 export function GameProvider({ children }: { children: React.ReactNode}) {
 
   const fetch = useFetch()
-  const { user } = useContext(UserContext)
+  const { user, updateStats } = useContext(UserContext)
 
   const [game, setGame] = useState<Game>()
   const [previousGuesses, setPreviousGuesses] = useState<Guess[]>([])
@@ -69,6 +69,13 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
           ...(solvedRow && { solved_row: solvedRow })
         }
       })
+        .then((response: { status: string, stats: object }) => {
+          if (response.stats) {
+            // @ts-ignore
+            let newDistribution = JSON.parse(response.stats.distribution)
+            updateStats({...response.stats, distribution: newDistribution} as Stats)
+          }
+        })
         .then(() => {
           setGame(undefined)
           setPreviousGuesses([])
