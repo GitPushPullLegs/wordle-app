@@ -1,5 +1,6 @@
-import React, {createContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import useFetch from "../api/useFetch";
+import {UserContext} from "./UserContext";
 
 
 interface Game {
@@ -32,7 +33,9 @@ export const GameContext = createContext<GameContextData>({
 
 
 export function GameProvider({ children }: { children: React.ReactNode}) {
+
   const fetch = useFetch()
+  const { user } = useContext(UserContext)
 
   const [game, setGame] = useState<Game>()
   const [previousGuesses, setPreviousGuesses] = useState<Guess[]>([])
@@ -110,10 +113,10 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
   useEffect(() => {
     // End game will make game undefined. This will start a new game.
     // Also has the benefit of preloading the first game.
-    if (!game) {
+    if (!game && user.user_id) {
       startGame()
     }
-  }, [game])
+  }, [game, user.user_id])
 
   useEffect(() => {
     // If the user has solved the game or if they've ran out of guesses, end the game.
