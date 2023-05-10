@@ -84,9 +84,11 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
         args: {
           game_id: game.game_id,
           guess: word,
-          correct: word === game.word
+          is_correct: word === game.word
         }
       })
+        .then((response) => console.log(response))
+        .catch((error) => console.log(error))
     } else {
       console.log("No active game.")
     }
