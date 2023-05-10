@@ -8,12 +8,11 @@ import {GameContext} from "../context/GameContext";
 
 export default function PlayPage() {
 
-  const { game, startGame, endGame, guess, getPreviousGuesses } = useContext(GameContext)
-
-  const [guesses, setGuesses] = useState<string[]>([])
+  const { game, previousGuesses, state, guess } = useContext(GameContext)
   const [currentGuess, setCurrentGuess] = useState("")
 
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (state === "loading") return
     let key = event.key
     if (key === "Backspace") {
       setCurrentGuess(current => current.slice(0, -1))
@@ -24,9 +23,10 @@ export default function PlayPage() {
         console.log("Too short.") // TODO: Inform the user.
       } else {
         guess(currentGuess)
+        setCurrentGuess("")
       }
     }
-  }, [currentGuess, guesses])
+  }, [currentGuess, previousGuesses, state])
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyPress)
@@ -46,7 +46,7 @@ export default function PlayPage() {
         bgcolor: grey[50]
       }}
     >
-      <TileGrid guesses={guesses} currentGuess={currentGuess} answer={"123"} />
+      <TileGrid guesses={previousGuesses.map(g => g.guess)} currentGuess={currentGuess} answer={game?.word ?? ""} />
     </Card>
   </>)
 }

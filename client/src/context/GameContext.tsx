@@ -14,6 +14,7 @@ interface Guess {
 interface GameContextData {
   game?: Game
   previousGuesses: Guess[]
+  state: "loading" | "loaded" | number  // If the state is a number, it's the row that was solved.
   startGame: () => void
   endGame: (solvedRow?: number) => void
   getPreviousGuesses: (gameId: string) => void
@@ -22,6 +23,7 @@ interface GameContextData {
 
 export const GameContext = createContext<GameContextData>({
   previousGuesses: [],
+  state: "loading",
   startGame: () => {},
   endGame: () => {},
   getPreviousGuesses: () => {},
@@ -34,8 +36,10 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
 
   const [game, setGame] = useState<Game>()
   const [previousGuesses, setPreviousGuesses] = useState<Guess[]>([])
+  const [state, setState] = useState<"loading"|"loaded"|number>("loading")
 
   function startGame() {
+    setState("loading")
     fetch("/api/game/start")
       .then((response: {status: string, game: Game, is_new: boolean}) => {
         setGame(response.game)
@@ -44,6 +48,8 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
       .then((response) => {
         if (!response.is_new) {
           getPreviousGuesses(response.game.game_id)
+        } else {
+          setState("loaded")
         }
       })
   }
@@ -58,8 +64,11 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
         }
       })
         .then(() => {
-          setGame(undefined)
-          setPreviousGuesses([])
+          setState(solvedRow ? solvedRow : 0)
+          setTimeout(() => {
+            setGame(undefined)
+            setPreviousGuesses([])
+          }, 2500)
         })
     } else {
       console.log("No active game.")
@@ -75,6 +84,7 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
       .then((response: { status: string, guess_list: Guess[] }) => {
         setPreviousGuesses(response.guess_list)
       })
+      .finally(() => setState("loaded"))
   }
 
   function guess(word: string) {
@@ -102,8 +112,19 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
     }
   }, [game])
 
+  useEffect(() => {
+    // If the user has solved the game or if they've ran out of guesses, end the game.
+    if (game && previousGuesses.length > 0) {
+      if (previousGuesses[previousGuesses.length - 1].guess === game.word) {
+        endGame(previousGuesses.length)
+      } else if (previousGuesses.length === 6) {
+        endGame()
+      }
+    }
+  }, [previousGuesses])
+
   return (
-    <GameContext.Provider value={{ game, previousGuesses, startGame, endGame, getPreviousGuesses, guess }}>
+    <GameContext.Provider value={{ game, previousGuesses, state, startGame, endGame, getPreviousGuesses, guess }}>
       {children}
     </GameContext.Provider>
   )
