@@ -9,10 +9,6 @@ interface User {
   full_name?: string
 
   level: number
-
-  // These may be moved to a new model, but I'll start them here.
-  current_streak: number
-  longest_streak: number
 }
 
 type FetchStatus = "fetching" | "fetched" | "failed"
@@ -25,8 +21,6 @@ interface UserContextData {
 export const UserContext = createContext<UserContextData>({
   user: {
     level: 1,
-    current_streak: 0,
-    longest_streak: 0,
   }
 })
 
@@ -35,8 +29,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<User>({
     level: 1,
-    current_streak: 0,
-    longest_streak: 0,
   })
   const [fetchStatus, setFetchStatus] = useState<FetchStatus>()
 
