@@ -2,6 +2,7 @@ import React, {useContext} from "react";
 import {Navigate, Outlet, Route, Routes} from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import {UserContext} from "./context/UserContext";
+import PlayPage from "./pages/PlayPage";
 
 
 function PrivateRoute() {
@@ -21,7 +22,7 @@ export default function Routing() {
     <Routes>
       <Route path={"/"} element={<LoginPage/>} />
       <Route element={<PrivateRoute/>}>
-        <Route path={"/play"} element={<>Play</>} />
+        <Route path={"/play"} element={<PlayPage/>} />
       </Route>
     </Routes>
   )
