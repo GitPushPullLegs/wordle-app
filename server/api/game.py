@@ -124,26 +124,6 @@ def submit_guess(query: GuessRequest):
     if not query.guess or query.is_correct is None:
         return jsonify(status="error", message="Missing required fields")
 
-    Guess(
-        game_id=query.game_id,
-        guess_id=str(uuid.uuid4()),
-        guess=query.guess,
-        correct=query.is_correct,
-    ).save()
-
-    return jsonify(status="ok")
-
-
-@api.get("/guess/validate")
-def validate_guess(query: GuessRequest):
-    user = g.current_user
-
-    if not user:
-        return jsonify(status="unauthorized", message="Login required")
-
-    if not query.guess:
-        return jsonify(status="error", message="No word to validate")
-
     response = get(
         f"https://dictionaryapi.com/api/v3/references/collegiate/json/{query.guess}",
         params=dict(
@@ -156,4 +136,11 @@ def validate_guess(query: GuessRequest):
     if len(data) == 0 or type(data[0]) != dict:
         return jsonify(status="ok", is_in_dictionary=False)
 
-    return jsonify(status="ok", is_in_dictionary=True)
+    Guess(
+        game_id=query.game_id,
+        guess_id=str(uuid.uuid4()),
+        guess=query.guess,
+        correct=query.is_correct,
+    ).save()
+
+    return jsonify(status="ok")
