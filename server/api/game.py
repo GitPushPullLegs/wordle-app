@@ -1,17 +1,16 @@
 import datetime
 import json
+import threading
 import uuid
 from typing import Optional
 
 from flask import g, jsonify
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel
-from requests import get
 
 from server.models.game import Game, Guess
 from server.models.stats import Stats
-from server.secret_manager import Secrets
-from server.word_list import WORDS
+from server.word_list import WORDS, DICTIONARY
 
 api = APIBlueprint("/game", __name__, url_prefix="/game")
 
@@ -124,23 +123,16 @@ def submit_guess(query: GuessRequest):
     if not query.guess or query.is_correct is None:
         return jsonify(status="error", message="Missing required fields")
 
-    response = get(
-        f"https://dictionaryapi.com/api/v3/references/collegiate/json/{query.guess}",
-        params=dict(
-            key=Secrets().get("DICTIONARY_API_KEY")
-        )
-    )
-
-    data = response.json()
-
-    if len(data) == 0 or type(data[0]) != dict:
+    if query.guess not in DICTIONARY:
         return jsonify(status="ok", is_in_dictionary=False)
 
-    Guess(
+    guess = Guess(
         game_id=query.game_id,
         guess_id=str(uuid.uuid4()),
         guess=query.guess,
         correct=query.is_correct,
-    ).save()
+    )
+
+    threading.Thread(target=lambda: guess.save()).start()
 
     return jsonify(status="ok")

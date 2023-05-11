@@ -19,8 +19,7 @@ interface GameContextData {
   startGame: () => void
   endGame: (solvedRow?: number) => void
   getPreviousGuesses: (gameId: string) => void
-  guess: (word: string) => void
-  setState: (value: string) => void
+  guess: (word: string) => Promise<any>
 }
 
 export const GameContext = createContext<GameContextData>({
@@ -29,8 +28,7 @@ export const GameContext = createContext<GameContextData>({
   startGame: () => {},
   endGame: () => {},
   getPreviousGuesses: () => {},
-  guess: () => {},
-  setState: () => {},
+  guess: () => new Promise(() => {}),
 })
 
 
@@ -101,26 +99,30 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
 
   function guess(word: string) {
     if (game) {
+      if (word.length < 5) {
+        return Promise.reject("too-short")
+      }
       if (word === game.word) {
         setState(previousGuesses.length + 1)
       }
-      setPreviousGuesses(current => [...current, { guess: word }])
-      fetch("/api/game/guess/submit", {
+      return fetch("/api/game/guess/submit", {
         args: {
           game_id: game.game_id,
           guess: word,
           is_correct: word === game.word
         }
       })
-        .then((response) => console.log(response))
-        .catch((error) => console.log(error))
+        .then((response) => {
+          if (response.is_in_dictionary === false) {
+            return Promise.reject("not-in-dictionary")
+          } else {
+            setPreviousGuesses(current => [...current, { guess: word }])
+          }
+          return response
+        })
     } else {
-      console.log("No active game.")
+      return Promise.reject("No active game")
     }
-  }
-
-  function setStateCustom(customState: string) {
-    setState(customState)
   }
 
   useEffect(() => {
@@ -143,7 +145,7 @@ export function GameProvider({ children }: { children: React.ReactNode}) {
   }, [previousGuesses])
 
   return (
-    <GameContext.Provider value={{ game, previousGuesses, state, setState: setStateCustom, startGame, endGame, getPreviousGuesses, guess }}>
+    <GameContext.Provider value={{ game, previousGuesses, state, startGame, endGame, getPreviousGuesses, guess }}>
       {children}
     </GameContext.Provider>
   )
