@@ -6,10 +6,11 @@ from typing import Optional
 from flask import g, jsonify
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel
-
+from requests import get
 
 from server.models.game import Game, Guess
 from server.models.stats import Stats
+from server.secret_manager import Secrets
 from server.word_list import WORDS
 
 api = APIBlueprint("/game", __name__, url_prefix="/game")
@@ -93,9 +94,7 @@ def update_game(query: GameRequest):
 
 
 class GuessRequest(BaseModel):
-    game_id: str
-
-    # The following are optional because we use this same request model to list previous requests.
+    game_id: Optional[str]
     guess: Optional[str]
     is_correct: Optional[bool]
 
@@ -133,3 +132,28 @@ def submit_guess(query: GuessRequest):
     ).save()
 
     return jsonify(status="ok")
+
+
+@api.get("/guess/validate")
+def validate_guess(query: GuessRequest):
+    user = g.current_user
+
+    if not user:
+        return jsonify(status="unauthorized", message="Login required")
+
+    if not query.guess:
+        return jsonify(status="error", message="No word to validate")
+
+    response = get(
+        f"https://dictionaryapi.com/api/v3/references/collegiate/json/{query.guess}",
+        params=dict(
+            key=Secrets().get("DICTIONARY_API_KEY")
+        )
+    )
+
+    data = response.json()
+
+    if len(data) == 0 or type(data[0]) != dict:
+        return jsonify(status="ok", is_in_dictionary=False)
+
+    return jsonify(status="ok", is_in_dictionary=True)
