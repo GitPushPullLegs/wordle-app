@@ -1,5 +1,6 @@
 import datetime
 import json
+import threading
 import uuid
 from typing import Optional
 
@@ -7,10 +8,9 @@ from flask import g, jsonify
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel
 
-
 from server.models.game import Game, Guess
 from server.models.stats import Stats
-from server.word_list import WORDS
+from server.word_list import WORDS, DICTIONARY
 
 api = APIBlueprint("/game", __name__, url_prefix="/game")
 
@@ -93,9 +93,7 @@ def update_game(query: GameRequest):
 
 
 class GuessRequest(BaseModel):
-    game_id: str
-
-    # The following are optional because we use this same request model to list previous requests.
+    game_id: Optional[str]
     guess: Optional[str]
     is_correct: Optional[bool]
 
@@ -125,11 +123,16 @@ def submit_guess(query: GuessRequest):
     if not query.guess or query.is_correct is None:
         return jsonify(status="error", message="Missing required fields")
 
-    Guess(
+    if query.guess not in DICTIONARY:
+        return jsonify(status="ok", is_in_dictionary=False)
+
+    guess = Guess(
         game_id=query.game_id,
         guess_id=str(uuid.uuid4()),
         guess=query.guess,
         correct=query.is_correct,
-    ).save()
+    )
+
+    threading.Thread(target=lambda: guess.save()).start()
 
     return jsonify(status="ok")

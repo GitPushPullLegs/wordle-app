@@ -6,9 +6,10 @@ interface FeedbackSnackbarProps {
   open: boolean
   onClose: () => void
   value: number | string
+  validWord?: "not-in-dictionary" | "too-short"
 }
 
-export default function FeedbackSnackbar({ open, onClose, value }: FeedbackSnackbarProps) {
+export default function FeedbackSnackbar({ open, onClose, value, validWord }: FeedbackSnackbarProps) {
   const messages = [
     "Amazing!",
     "Great job!",
@@ -17,8 +18,12 @@ export default function FeedbackSnackbar({ open, onClose, value }: FeedbackSnack
     "Phew!",
     "Barely made it!",
     `Oops! It was ${value}!`,
-    "Too short!",
   ]
+
+  const wordMessages = {
+    "not-in-dictionary": "Not a valid word!",
+    "too-short": "Too short!",
+  }
 
   return (
     <Snackbar
@@ -31,7 +36,7 @@ export default function FeedbackSnackbar({ open, onClose, value }: FeedbackSnack
       }}
     >
       <Alert icon={false} severity={typeof value === "number" ? "success" : "error"} sx={{ width: '100%' }}>
-        {messages[typeof value === "string" ? (value === "too-short" ? messages.length - 1 : messages.length - 2) : value - 1]}
+        {validWord ? wordMessages[validWord] : messages[typeof value === "string" ? messages.length - 1 : value - 1]}
       </Alert>
     </Snackbar>
   )
